@@ -1,0 +1,111 @@
+@extends('layout')
+@section('title', 'Registration')
+@section('content')
+    <div class="container">
+        <form class="ms-auto me-auto mt-3" style="width:500px" action="{{route('registration.post')}}" method="POST" onsubmit="return validateForm()">
+            @csrf
+            <div class="mb-3">
+                <label for="full_name" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="full_name" name="full_name" >
+            </div>
+            <div class="mb-3">
+                <label for="user_name" class="form-label">Username</label>
+                <input type="text" class="form-control" id="user_name" name="user_name" >
+            </div>
+            <div class="mb-3">
+                <label for="birthdate" class="form-label">Birthdate</label>
+                <input type="date" class="form-control" id="birthdate" name="birthdate" >
+            </div>
+            <div class="mb-3">
+                <button type="button" id="checkActorsButton" class="btn btn-outline-info" onclick="getActorsBornToday()">Check Actors Born Today</button>
+            </div>
+            <div class="mb-3">
+                <label for="phone" class="form-label">Phone</label>
+                <input type="text" class="form-control" id="phone" name="phone" >
+            </div>
+            <div class="mb-3">
+                <label for="address" class="form-label">Address</label>
+                <input type="text" class="form-control" id="address" name="address" >
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" >
+            </div>
+            <div class="mb-3">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" >
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="email" name="email" >
+            </div>
+            <div class="mb-3">
+                <label for="user_image" class="form-label">User Image</label>
+                <input type="file" class="form-control" id="user_image" name="user_image">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+    </div>  
+    {{-- <script src="API_Ops.js"></script> --}}
+    {{-- <script type="text/javascript" src="{{asset('js/API_Ops.js') }}"></script> --}}
+    <script type="text/javascript" src="{{ URL::asset('API_Ops.js') }}"></script>
+    <script>
+
+        // Function to validate the form fields
+        function validateForm() {
+            var full_name = document.getElementById("full_name").value;
+            var user_name = document.getElementById("user_name").value;
+            var birthdate = document.getElementById("birthdate").value;
+            var phone = document.getElementById("phone").value;
+            var address = document.getElementById("address").value;
+            var password = document.getElementById("password").value;
+            var confirm_password = document.getElementById("confirm_password").value;
+            var user_image = document.getElementById("user_image").value;
+            var email = document.getElementById("email").value;
+    
+            // Check if any field is empty
+            if (full_name === "" || user_name === "" || birthdate === "" || phone === "" || address === "" || password === "" || confirm_password === "" || user_image === "" || email === "") {
+                alert("All fields are mandatory.");
+                return false;
+            }
+    
+            // Check if email is valid
+            var email_pattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+            if (!email_pattern.test(email)) {
+                alert("Please enter a valid email address.");
+                return false;
+            }
+    
+            // Check if birthdate is valid
+            var birthdate_pattern = /^\d{4}-\d{2}-\d{2}$/;
+            if (!birthdate_pattern.test(birthdate)) {
+                alert("Please enter a valid birthdate (YYYY-MM-DD format).");
+                return false;
+            }
+    
+            // Check if full name contains only letters and spaces
+            var full_name_pattern = /^[a-zA-Z\s]*$/;
+            if (!full_name_pattern.test(full_name)) {
+                alert("Please enter a valid full name (letters and spaces only).");
+                return false;
+            }
+    
+            // Check if password meets requirements (at least 8 characters with at least 1 number and 1 special character)
+            var password_pattern = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
+            if (!password_pattern.test(password)) {
+                alert("Password must be at least 8 characters long and contain at least 1 number and 1 special character.");
+                return false;
+            }
+    
+            // Check if password matches confirm password
+            if (password !== confirm_password) {
+                alert("Passwords do not match.");
+                return false;
+            }
+    
+            // Validation passed
+            return true;
+        }
+    </script>
+    
+@endsection
