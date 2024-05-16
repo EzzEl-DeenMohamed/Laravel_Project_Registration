@@ -13,4 +13,9 @@ Route::get('registration',[AuthManager::class,'registration'])->name('registrati
 Route::post('registration',[AuthManager::class,'registrationPost'])->name('registration.post');
 Route::get('logout',[AuthManager::class,'logout'])->name('logout');
 
-
+Route::get('lang/{locale}', function ($locale) {
+    if (in_array($locale, ['en', 'ar'])) {
+        session(['locale' => $locale]);
+    }
+    return redirect()->back();
+});

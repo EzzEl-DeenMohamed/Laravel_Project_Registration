@@ -5,26 +5,26 @@
         <form class="ms-auto me-auto mt-3" style="width:500px" action="{{route('registration.post')}}" method="POST" onsubmit="return validateForm()">
             @csrf
             <div class="mb-3">
-                <label for="full_name" class="form-label">Full Name</label>
+                <label for="full_name" class="form-label">{{__('Full Name')}}</label>
                 <input type="text" class="form-control" id="full_name" name="full_name" >
             </div>
             <div class="mb-3">
-                <label for="user_name" class="form-label">Username</label>
+                <label for="user_name" class="form-label">{{__('Username')}}</label>
                 <input type="text" class="form-control" id="user_name" name="user_name" >
             </div>
             <div class="mb-3">
-                <label for="birthdate" class="form-label">Birthdate</label>
+                <label for="birthdate" class="form-label">{{__('Birthdate')}}</label>
                 <input type="date" class="form-control" id="birthdate" name="birthdate" >
             </div>
             <div class="mb-3">
-                <button type="button" id="checkActorsButton" class="btn btn-outline-info" onclick="getActorsBornToday()">Check Actors Born Today</button>
+                <button type="button" id="checkActorsButton" class="btn btn-outline-info" onclick="getActorsBornToday()">{{__('Check Actors Born Today')}}</button>
             </div>
             <div class="mb-3">
-                <label for="phone" class="form-label">Phone</label>
+                <label for="phone" class="form-label">{{__('Phone')}}Phone</label>
                 <input type="text" class="form-control" id="phone" name="phone" >
             </div>
             <div class="mb-3">
-                <label for="address" class="form-label">Address</label>
+                <label for="address" class="form-label">{{__('Address')}}</label>
                 <input type="text" class="form-control" id="address" name="address" >
             </div>
             <div class="mb-3">
