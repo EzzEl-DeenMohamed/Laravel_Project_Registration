@@ -25,10 +25,11 @@ class AuthManager extends Controller
     }
 
     function loginPost(Request $request){
-        error_log('login post');
-        $credentials = $request->only('email','password');
+        $credentials = [
+            'email' => $request->email,
+            'password' => $request->password
+        ];
         if(Auth::attempt($credentials)){
-            error_log('login post Done');
             return redirect()->intended(route('home'));
         }
         error_log('login post failed');
