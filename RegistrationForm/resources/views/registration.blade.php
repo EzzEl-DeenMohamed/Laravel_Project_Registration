@@ -28,22 +28,22 @@
                 <input type="text" class="form-control" id="address" name="address" >
             </div>
             <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
+                <label for="password" class="form-label">{{__('Password')}}</label>
                 <input type="password" class="form-control" id="password" name="password" >
             </div>
             <div class="mb-3">
-                <label for="confirm_password" class="form-label">Confirm Password</label>
+                <label for="confirm_password" class="form-label">{{__('Confirm Password')}}</label>
                 <input type="password" class="form-control" id="confirm_password" name="confirm_password" >
             </div>
             <div class="mb-3">
-                <label for="email" class="form-label">Email address</label>
+                <label for="email" class="form-label">{{__('Email address')}}</label>
                 <input type="email" class="form-control" id="email" name="email" >
             </div>
             <div class="mb-3">
-                <label for="user_image" class="form-label">User Image</label>
+                <label for="user_image" class="form-label">{{__('User Image')}}</label>
                 <input type="file" class="form-control" id="user_image" name="user_image">
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">{{__('Submit')}}</button>
           </form>
     </div>  
     {{-- <script src="API_Ops.js"></script> --}}

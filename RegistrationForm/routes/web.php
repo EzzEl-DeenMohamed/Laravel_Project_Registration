@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\AuthManager;
+use App\Http\Controllers\LocaleController;
 use Illuminate\Support\Facades\Route;
+
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -13,9 +16,4 @@ Route::get('registration',[AuthManager::class,'registration'])->name('registrati
 Route::post('registration',[AuthManager::class,'registrationPost'])->name('registration.post');
 Route::get('logout',[AuthManager::class,'logout'])->name('logout');
 
-Route::get('lang/{locale}', function ($locale) {
-    if (in_array($locale, ['en', 'ar'])) {
-        session(['locale' => $locale]);
-    }
-    return redirect()->back();
-});
+Route::get('locale/{lang}',[LocaleController::class, 'setLocale']);

@@ -1,6 +1,7 @@
 {
     "Welcome to our website": "مرحبا بكم في موقعنا",
     "Home": "الرئيسية",
+    "3zoz": "عزوز",
     "About": "عنا",
     "Contact": "اتصل بنا",
     "Services": "خدماتنا",
@@ -23,5 +24,7 @@
     "Choose File": "اختر ملف",
     "No File Chosen": "لم يتم اختيار ملف",
     "FCAI Group": "كلية الحاسبات و المعلومات و الذكاء الاصطناعي",
-    "Toggle Language":"تغيير اللغة"
+    "Toggle Language":"تغيير اللغة",
+    "This project is a collage of efforts aimed at discouraging students from studying for their final exams.":".هذا المشروع هو عبارة عن مجموعة من الجهود الرامية إلى تثبيط الطلاب عن الدراسة للامتحانات النهائية"
+    
 }

@@ -1,6 +1,7 @@
 {
     "Welcome to our website": "Welcome to our website",
     "Home": "Home",
+    "3zoz": "3zoz",
     "About": "About",
     "Contact": "Contact",
     "Services": "Services",
@@ -23,5 +24,6 @@
     "Choose File": "Choose File",
     "No File Chosen": "No File Chosen",
     "FCAI Group": "FCAI Group",
-    "Toggle Language": "Toggle Language"
+    "Toggle Language": "Toggle Language",
+    "This project is a collage of efforts aimed at discouraging students from studying for their final exams.": "This project is a collage of efforts aimed at discouraging students from studying for their final exams."
 }

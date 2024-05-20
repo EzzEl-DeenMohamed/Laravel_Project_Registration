@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
   <div class="container-fluid">
-      <a class="navbar-brand" href="#">3zoz</a>
+      <a class="navbar-brand" href="#">{{__('3zoz')}}</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
       </button>
@@ -21,10 +21,13 @@
                   <a class="nav-link" href="{{route('registration')}}">{{__('Register')}}</a>
               </li>
               @endauth
+              <li class="nav-item">
+                <a id="language-toggle" class="nav-link" href="locale/en" >English</a>
+              </li>
+              <li class="nav-item">
+                <a id="language-toggle" class="nav-link" href="locale/ar" >Arabic</a>
+              </li>
           </ul>
-          <div id="languageToggle" class="navbar-text ms-auto d-flex">
-            <button onclick="toggleLanguage()">{{__('Toggle Language')}}</button>
-          </div>
           <span class="navbar-text ms-auto d-flex">
               @auth
               Hi, {{auth()->user()->user_name}}
@@ -33,10 +36,3 @@
       </div>
   </div>
 </nav>
-<script>
-    function toggleLanguage() {
-        var currentLang = document.documentElement.lang;
-        var newLang = currentLang === 'en' ? 'ar' : 'en';
-        window.location.href = "{{ url('lang/') }}" + newLang;
-    }
-</script>
