@@ -21,8 +21,8 @@ class AuthManagerTest extends TestCase
             'birthdate' => '1990-01-01',
             'phone' => '1234567890',
             'address' => '123 Street, City',
-            'password' => 'password',
-            'email' => 'john@example.com',
+            'password' => '852741Ewq@',
+            'email' => 'ezzeldeenm896@gmail.com',
         ]);
 
         $response->assertRedirect('/login')
@@ -33,13 +33,13 @@ class AuthManagerTest extends TestCase
     public function user_can_login()
     {
         $user = User::factory()->create([
-            'email' => 'john@example.com',
-            'password' => Hash::make('password'),
+            'email' => 'ezzeldeenm896@gmail.com',
+            'password' => Hash::make('852741Ewq@'),
         ]);
 
         $response = $this->post('/login', [
-            'email' => 'john@example.com',
-            'password' => 'password',
+            'email' => 'ezzeldeenm896@gmail.com',
+            'password' => '852741Ewq@',
         ]);
 
         $response->assertRedirect('/home');
@@ -50,13 +50,13 @@ class AuthManagerTest extends TestCase
     public function user_cannot_login_with_invalid_credentials()
     {
         $user = User::factory()->create([
-            'email' => 'john@example.com',
-            'password' => Hash::make('password'),
+            'email' => 'ezzeldeenm896@gmail.com',
+            'password' => Hash::make('852741Ewq@'),
         ]);
 
         $response = $this->post('/login', [
-            'email' => 'john@example.com',
-            'password' => 'wrongpassword',
+            'email' => 'ezzeldeenm896@gmail.com',
+            'password' => '852741Ewq@',
         ]);
 
         $response->assertRedirect('/login')

@@ -30,7 +30,7 @@
           </ul>
           <span class="navbar-text ms-auto d-flex">
               @auth
-              Hi, {{auth()->user()->user_name}}
+              {{__('Hi,')}} {{auth()->user()->user_name}}
               @endauth
           </span>
       </div>

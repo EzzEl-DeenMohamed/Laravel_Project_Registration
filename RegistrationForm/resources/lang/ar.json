@@ -1,6 +1,9 @@
 {
     "Welcome to our website": "مرحبا بكم في موقعنا",
+    "Hi,":"مرحبا,",
     "Home": "الرئيسية",
+    "Send Email": "ارسل الي بريد الكتروني",
+    "Send Phone": "ارسل الي رقم هاتف",
     "3zoz": "عزوز",
     "About": "عنا",
     "Contact": "اتصل بنا",
@@ -26,5 +29,5 @@
     "FCAI Group": "كلية الحاسبات و المعلومات و الذكاء الاصطناعي",
     "Toggle Language":"تغيير اللغة",
     "This project is a collage of efforts aimed at discouraging students from studying for their final exams.":".هذا المشروع هو عبارة عن مجموعة من الجهود الرامية إلى تثبيط الطلاب عن الدراسة للامتحانات النهائية"
-    
+
 }

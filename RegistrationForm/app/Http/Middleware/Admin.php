@@ -5,10 +5,8 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\App;
 
-class LocallizationMiddleware
+class Admin
 {
     /**
      * Handle an incoming request.
@@ -17,10 +15,12 @@ class LocallizationMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if ((auth()->user()->user_type != 'admin') || (auth()->user()->user_type == null))
+        {
+            abort(401);
+        }
 
-        $locale = Session::get('locale') ?? 'en';
-        Session::put('locale', $locale);
-        App::setLocale($locale);
         return $next($request);
+
     }
 }

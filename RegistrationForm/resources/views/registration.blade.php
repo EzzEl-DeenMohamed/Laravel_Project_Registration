@@ -20,7 +20,7 @@
                 <button type="button" id="checkActorsButton" class="btn btn-outline-info" onclick="getActorsBornToday()">{{__('Check Actors Born Today')}}</button>
             </div>
             <div class="mb-3">
-                <label for="phone" class="form-label">{{__('Phone')}}Phone</label>
+                <label for="phone" class="form-label">{{__('Phone')}}</label>
                 <input type="text" class="form-control" id="phone" name="phone" >
             </div>
             <div class="mb-3">
@@ -43,13 +43,32 @@
                 <label for="user_image" class="form-label">{{__('User Image')}}</label>
                 <input type="file" class="form-control" id="user_image" name="user_image">
             </div>
+
+            <div class="mb-4">
+                <button type="button" id="sendEmailButton" class="btn btn-outline-info" onclick="handleButtonClick('sendEmailButton', 'sendPhoneButton')">{{__('Send Email')}}</button>
+                <button type="button" id="sendPhoneButton" class="btn btn-outline-info" onclick="handleButtonClick('sendPhoneButton', 'sendEmailButton')">{{__('Send Phone')}}</button>
+            </div>
+
+            <input type="text" class="form-control" id="messageType" name="messageType" style="display: none;">
+
             <button type="submit" class="btn btn-primary">{{__('Submit')}}</button>
           </form>
-    </div>  
+    </div>
     {{-- <script src="API_Ops.js"></script> --}}
     {{-- <script type="text/javascript" src="{{asset('js/API_Ops.js') }}"></script> --}}
     <script type="text/javascript" src="{{ URL::asset('API_Ops.js') }}"></script>
     <script>
+
+        function handleButtonClick(clickedButtonId, otherButtonId) {
+            const clickedButton = document.getElementById(clickedButtonId);
+            const otherButton = document.getElementById(otherButtonId);
+
+            // Toggle clicked button active state
+            clickedButton.classList.add('active');
+
+            // Remove active state from the other button
+            otherButton.classList.remove('active');
+        }
 
         // Function to validate the form fields
         function validateForm() {
@@ -62,50 +81,67 @@
             var confirm_password = document.getElementById("confirm_password").value;
             var user_image = document.getElementById("user_image").value;
             var email = document.getElementById("email").value;
-    
+
             // Check if any field is empty
             if (full_name === "" || user_name === "" || birthdate === "" || phone === "" || address === "" || password === "" || confirm_password === "" || user_image === "" || email === "") {
                 alert("All fields are mandatory.");
                 return false;
             }
-    
+
             // Check if email is valid
             var email_pattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
             if (!email_pattern.test(email)) {
                 alert("Please enter a valid email address.");
                 return false;
             }
-    
+
             // Check if birthdate is valid
             var birthdate_pattern = /^\d{4}-\d{2}-\d{2}$/;
             if (!birthdate_pattern.test(birthdate)) {
                 alert("Please enter a valid birthdate (YYYY-MM-DD format).");
                 return false;
             }
-    
+
             // Check if full name contains only letters and spaces
             var full_name_pattern = /^[a-zA-Z\s]*$/;
             if (!full_name_pattern.test(full_name)) {
                 alert("Please enter a valid full name (letters and spaces only).");
                 return false;
             }
-    
+
             // Check if password meets requirements (at least 8 characters with at least 1 number and 1 special character)
             var password_pattern = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
             if (!password_pattern.test(password)) {
                 alert("Password must be at least 8 characters long and contain at least 1 number and 1 special character.");
                 return false;
             }
-    
+
             // Check if password matches confirm password
             if (password !== confirm_password) {
                 alert("Passwords do not match.");
                 return false;
             }
-    
+
+            if (!sendEmailButton.classList.contains('active') && !sendPhoneButton.classList.contains('active')) {
+                alert('Please click on either "Send Email" or "Send Phone" button.');
+                return false; // Prevent form submission
+            }
+
+            if(sendEmailButton.classList.contains('active'))
+                document.getElementById("messageType").value = "email";
+            else
+                document.getElementById("messageType").value = "phone";
+
             // Validation passed
             return true;
         }
     </script>
-    
+
+    <style>
+        .btn.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+    </style>
+
 @endsection
