@@ -15,7 +15,7 @@ class Admin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ((auth()->user()->user_type != 'admin') || (auth()->user()->user_type == null))
+        if ((auth()->user()->user_type != 'admin') && (auth()->user()->user_type == null))
         {
             abort(401);
         }

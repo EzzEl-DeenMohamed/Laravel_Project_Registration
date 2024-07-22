@@ -2,15 +2,22 @@
 
 namespace App\Services\SendMessageRequest\MessageType;
 
+use App\Dtos\DtoSendMessage;
 use App\Services\Contracts\SenderInterface;
+use function Laravel\Prompts\alert;
+
 
 class Sms implements SenderInterface
 {
-    public function send()
+    public string $message;
+    public function __construct(string $message)
     {
-        return "Sms sent";
+        $this->message = $message;
     }
-}
-{
 
+    public function send(DtoSendMessage $dtoSendMessage)
+    {
+        alert($this->message);
+
+    }
 }

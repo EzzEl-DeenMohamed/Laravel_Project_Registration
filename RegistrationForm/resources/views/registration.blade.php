@@ -45,8 +45,9 @@
             </div>
 
             <div class="mb-4">
-                <button type="button" id="sendEmailButton" class="btn btn-outline-info" onclick="handleButtonClick('sendEmailButton', 'sendPhoneButton')">{{__('Send Email')}}</button>
-                <button type="button" id="sendPhoneButton" class="btn btn-outline-info" onclick="handleButtonClick('sendPhoneButton', 'sendEmailButton')">{{__('Send Phone')}}</button>
+                <button type="button" id="sendEmailButton" class="btn btn-outline-info" onclick="handleButtonClick">{{__('Send Email')}}</button>
+                <button type="button" id="sendPhoneButton" class="btn btn-outline-info" onclick="handleButtonClick">{{__('Send Phone')}}</button>
+                <button type="button" id="sendPushNotificationButton" class="btn btn-outline-info" onclick="handleButtonClick">{{__('Send PushNotification')}}</button>
             </div>
 
             <input type="text" class="form-control" id="messageType" name="messageType" style="display: none;">
@@ -59,15 +60,36 @@
     <script type="text/javascript" src="{{ URL::asset('API_Ops.js') }}"></script>
     <script>
 
-        function handleButtonClick(clickedButtonId, otherButtonId) {
-            const clickedButton = document.getElementById(clickedButtonId);
-            const otherButton = document.getElementById(otherButtonId);
+        document.addEventListener('DOMContentLoaded', (event) => {
+            handleButtonClick();
+        });
 
-            // Toggle clicked button active state
-            clickedButton.classList.add('active');
+        function handleButtonClick() {
+            const sendEmailButton = document.getElementById('sendEmailButton');
+            const sendPhoneButton = document.getElementById('sendPhoneButton');
+            const sendPushNotificationButton = document.getElementById('sendPushNotificationButton');
+            const messageTypeInput = document.getElementById('messageType');
 
-            // Remove active state from the other button
-            otherButton.classList.remove('active');
+            sendEmailButton.addEventListener('click', () => {
+                sendEmailButton.classList.add('active');
+                sendPhoneButton.classList.remove('active');
+                sendPushNotificationButton.classList.remove('active');
+                messageTypeInput.value = 'email';
+            });
+
+            sendPhoneButton.addEventListener('click', () => {
+                sendEmailButton.classList.remove('active');
+                sendPhoneButton.classList.add('active');
+                sendPushNotificationButton.classList.remove('active');
+                messageTypeInput.value = 'phone';
+            });
+
+            sendPushNotificationButton.addEventListener('click', () => {
+                sendEmailButton.classList.remove('active');
+                sendPhoneButton.classList.remove('active');
+                sendPushNotificationButton.classList.add('active');
+                messageTypeInput.value = 'push';
+            });
         }
 
         // Function to validate the form fields
@@ -122,15 +144,11 @@
                 return false;
             }
 
-            if (!sendEmailButton.classList.contains('active') && !sendPhoneButton.classList.contains('active')) {
+            if (!sendEmailButton.classList.contains('active') && !sendPhoneButton.classList.contains('active')&& !sendPushNotificationButton.classList.contains('active')) {
                 alert('Please click on either "Send Email" or "Send Phone" button.');
                 return false; // Prevent form submission
             }
 
-            if(sendEmailButton.classList.contains('active'))
-                document.getElementById("messageType").value = "email";
-            else
-                document.getElementById("messageType").value = "phone";
 
             // Validation passed
             return true;
@@ -139,7 +157,7 @@
 
     <style>
         .btn.active {
-            background-color: #0d6efd;
+            background-color: #629fd5;
             color: white;
         }
     </style>

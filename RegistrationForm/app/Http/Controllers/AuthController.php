@@ -7,6 +7,7 @@ use App\Http\Requests\RegisterPost;
 use App\Dtos\DtoLogin;
 use App\Dtos\DtoRegister;
 use App\Services\AuthService;
+use App\Exceptions\FailedToLogin;
 
 class AuthController extends Controller
 {
@@ -17,23 +18,24 @@ class AuthController extends Controller
         $this->_authServices = $authServices;
     }
 
+    public function loginPost(LoginPost $request)
+    {
+        $dtoLogin = new DtoLogin($request->email, $request->password);
+
+        return $this->_authServices->loginPostService($dtoLogin) ? view('welcome') : throw new FailedToLogin();
+    }
+
+    /**
+     * @throws FailedToLogin
+     */
     public function login()
     {
-        return $this->_authServices->loginServices() ? redirect(route('home')) : view('login');
+        return $this->_authServices->loginServices() ? view('welcome') : view('login');
     }
 
     public function registration()
     {
         return view('registration');
-    }
-
-    public function loginPost(LoginPost $request)
-    {
-        $dtoLogin = new DtoLogin($request->email, $request->password);
-
-        $result = $this->_authServices->loginPostService($dtoLogin);
-
-        return $result['success'] ?  redirect()->intended(route('home')) : error_log('login post failed');
     }
 
     public function registrationPost(RegisterPost $request)
@@ -50,8 +52,7 @@ class AuthController extends Controller
 
         );
 
-        $validateRegistration = $this->_authServices->registrationPostService($dtoRegister);
-        return !$validateRegistration['success'] ? redirect(route('registration')) : redirect(route('login'));
+        return !$this->_authServices->registrationPostService($dtoRegister) ? redirect(route('registration')) : redirect(route('login'));
     }
 
     public function logout()

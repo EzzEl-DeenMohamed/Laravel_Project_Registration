@@ -12,8 +12,9 @@ use App\Models\User;
 
 class AuthService
 {
+
     public function loginServices(){
-        return Auth::check() ? ['success'=>true] :['success'=>false];
+        return Auth::check();
     }
 
     public function loginPostService(DtoLogin $data){
@@ -21,7 +22,7 @@ class AuthService
         return Auth::attempt([
             'email' => $data->getEmail(),
             'password' => $data->getPassword()
-        ]) ? ['success'=>true] : ['success'=>false];
+        ]);
     }
 
     public function registrationPostService(DtoRegister $dtoRegister){
@@ -34,19 +35,18 @@ class AuthService
         $data['password'] = Hash::make($dtoRegister->getPassword());
         $data['email'] = $dtoRegister->getEmail();
         $data['user_type'] = 'user';
-
-
+        $data['verified'] = $dtoRegister->getMessageType();
 
         $user = User::create($data);
 
         if(!$user){
-            return ['success'=>false,'message'=>'Registration failed!!'];
+            return false;
         }
 
         $SendMessageRegistrationController = new SendMessageRegistrationController();
 
         $SendMessageRegistrationController->send($dtoRegister);
-        return ['success'=>true,'message'=>'Registration Success, Login to access your app!!'];
+        return true;
     }
 
     public function logout() {
