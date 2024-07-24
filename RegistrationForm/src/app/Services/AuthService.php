@@ -3,15 +3,20 @@
 namespace App\Services;
 
 use App\Http\Controllers\SendMessageRegistrationController;
+use App\repository\UserRepository;
 use App\Dtos\{DtoLogin, DtoRegister};
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 
 
 class AuthService
 {
+    public UserRepository $userRepository;
+
+    function __construct(UserRepository $userRepository)
+    {
+        $this->userRepository = $userRepository;
+    }
 
     public function loginServices(){
         return Auth::check();
@@ -27,24 +32,13 @@ class AuthService
 
     public function registrationPostService(DtoRegister $dtoRegister){
 
-        $data['full_name'] = $dtoRegister->getFullName();
-        $data['user_name'] = $dtoRegister->getUserName();
-        $data['birthdate'] = $dtoRegister->getBirthdate();
-        $data['phone'] = $dtoRegister->getPhone();
-        $data['address'] = $dtoRegister->getAddress();
-        $data['password'] = Hash::make($dtoRegister->getPassword());
-        $data['email'] = $dtoRegister->getEmail();
-        $data['user_type'] = 'user';
-        $data['verified'] = $dtoRegister->getMessageType();
-
-        $user = User::create($data);
+        $user = $this->userRepository->addUser($dtoRegister);
 
         if(!$user){
             return false;
         }
 
         $SendMessageRegistrationController = new SendMessageRegistrationController();
-
         $SendMessageRegistrationController->send($dtoRegister);
         return true;
     }

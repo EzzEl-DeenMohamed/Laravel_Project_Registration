@@ -18,7 +18,7 @@ Route::get('logout',[AuthController::class,'logout'])->name('logout');
 Route::get('registration',[AuthController::class,'registration'])->name('registration');
 Route::post('registration',[AuthController::class,'registrationPost'])->name('registration.post');
 Route::post('/send-message-registration', [SendMessageRegistrationController::class, 'send']);
-Route::post('/send-sms', [SendMessageRegistrationController::class, 'send']);
+
 
 Route::get('locale/{lang}',[LocaleController::class, 'setLocale']);
 Route::get('adminPlace',[AuthController::class,'adminPlace'])->name('adminPlace')->middleware('admin');
