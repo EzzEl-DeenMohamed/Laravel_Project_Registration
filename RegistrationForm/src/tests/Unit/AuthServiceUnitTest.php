@@ -2,15 +2,15 @@
 
 namespace Tests\Unit;
 
-use App\Http\Controllers\SendMessageRegistrationController;
-use Tests\TestCase;
-use App\Services\AuthService;
-use App\repository\UserRepository;
 use App\Dtos\DtoLogin;
 use App\Dtos\DtoRegister;
+use App\Http\Controllers\SendMessageRegistrationController;
+use App\repository\UserRepository;
+use App\Services\Auth\RegistrationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Mockery;
+use Tests\TestCase;
 
 class AuthServiceUnitTest extends TestCase
 {
@@ -21,7 +21,7 @@ class AuthServiceUnitTest extends TestCase
     {
         parent::setUp();
         $this->userRepositoryMock = Mockery::mock(UserRepository::class);
-        $this->authService = Mockery::mock(new AuthService($this->userRepositoryMock));
+        $this->authService = Mockery::mock(new RegistrationService($this->userRepositoryMock));
     }
 
     public function testLoginServicesReturnsFalseWhenNotAuthenticated()

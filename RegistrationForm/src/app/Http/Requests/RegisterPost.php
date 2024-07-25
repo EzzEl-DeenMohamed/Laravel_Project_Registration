@@ -25,11 +25,7 @@ class RegisterPost extends FormRequest
             'full_name' => 'required|string|max:255',
             'user_name' => 'required|string|unique:users,user_name|max:255',
             'birthdate' => 'required|date',
-            'phone' => 'required|string|max:15',
             'address' => 'required|string|max:255',
-            'password' => 'required|string|min:8',
-            'email' => 'required|string|email|unique:users,email|max:255',
-            'messageType' => 'required|string',
         ];
     }
 
@@ -46,13 +42,7 @@ class RegisterPost extends FormRequest
             'user_name.unique' => 'This user name has already been taken.',
             'birthdate.required' => 'Birthdate is required.',
             'birthdate.date' => 'Birthdate must be a valid date.',
-            'phone.required' => 'Phone number is required.',
             'address.required' => 'Address is required.',
-            'password.required' => 'Password is required.',
-            'password.min' => 'Password must be at least 8 characters.',
-            'email.required' => 'Email is required.',
-            'email.email' => 'Email must be a valid email address.',
-            'email.unique' => 'This email has already been taken.',
         ];
     }
 }
