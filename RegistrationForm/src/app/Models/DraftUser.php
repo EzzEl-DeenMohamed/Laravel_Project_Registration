@@ -23,7 +23,8 @@ class DraftUser extends Authenticatable
         'email',
         'password',
         'current_status',
-        'image_url'
+        'image_url',
+        'verified',
     ];
 
     /**
