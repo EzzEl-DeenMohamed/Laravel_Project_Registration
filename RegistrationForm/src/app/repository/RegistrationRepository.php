@@ -3,13 +3,15 @@
 namespace App\repository;
 
 use App\Dtos\DtoRegister;
-use App\Models\DraftUser;
+use App\Models\RegistrationStep;
 use App\Models\User;
+use App\repository\Contracts\RegistrationRepositoryInterface;
+use Exception;
 use Illuminate\Support\Facades\Hash;
 
-class RegistrationRepository
+class RegistrationRepository implements RegistrationRepositoryInterface
 {
-    public function addUser(DtoRegister $dtoRegister)
+    public function addUser(DtoRegister $dtoRegister): User
     {
         $data['full_name'] = $dtoRegister->getFullName();
         $data['user_name'] = $dtoRegister->getUserName();
@@ -26,101 +28,130 @@ class RegistrationRepository
         return $user;
     }
 
-    public function initializeDraftUserIfNotExist()
+    /**
+     * @throws Exception
+     */
+    public function checkIfExistUser($data): ?RegistrationStep
     {
-        $draftUser = $this->getDraftUser(session('user_name'));
+        $userName = $this->extractUserNameFromData($data);
 
-        if (!$draftUser) {
-            $draftUser = DraftUser::create([
-                'user_name' => '',
-                'full_name' => '',
-                'birthdate' => '1990-01-01',
-                'address' => '',
-                'phone' => '',
-                'email' => '',
-                'password' => '',
-                'image_url' => '',
-                'current_status' => 'Step1',
-                'user_type' => 'user',
-                'email_verified_at' => '',
-            ]);
+        if (User::where('user_name', $userName)->exists()) {
+            // If the username exists, throw an exception
+            throw new Exception('Username already exists.');
         }
-        $this->saveUserNameSession($draftUser->user_name);
-        return $draftUser;
+
+        if (!$userName) {
+            return null;
+        }
+
+        // Fetch all registration steps and filter by user_name in the nested JSON
+        $registrationSteps = RegistrationStep::all();
+        $registrationStep = null;
+
+        foreach ($registrationSteps as $step) {
+
+            if(is_array($step['data'])){
+                $stepData = $step['data'];
+            }
+            else {
+                $stepData = json_decode($step['data'], true);
+            }
+
+            if (isset($stepData['Profile Data'])) {
+                $firstPageData = $stepData['Profile Data'];
+
+                // Decode First Page data if it's a string
+                if (is_string($firstPageData)) {
+                    $firstPageData = json_decode($firstPageData, true);
+                }
+
+                // Ensure that firstPageData is an array
+                if (is_array($firstPageData)) {
+                    $userNameInArray = $this->extractUserNameFromData($firstPageData) ?? null;
+
+                    if ($userName !== null && $userName === $userNameInArray) {
+                        $registrationStep = $step;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $registrationStep;
     }
 
-    public function addFirstDraftPage($request)
+    /**
+     * @throws Exception
+     */
+    public function findUserById($id): ?RegistrationStep
     {
-        $draftUser = $this->getDraftUser($request->input('user_name'));
+        return RegistrationStep::find($id);
+    }
 
-        if ($draftUser) {
-            // Update the user's fields
-            $draftUser->full_name = $request->input('full_name');
-            $draftUser->user_name = $request->input('user_name');
-            $draftUser->birthdate = $request->input('birthdate');
-            $draftUser->address = $request->input('address');
-            $draftUser->current_status = 'Step1';
-            $draftUser->save();
-            $this->saveUserNameSession($draftUser->user_name);
-        } else {
-            // Handle the case where the user is not found
-            return redirect()->back()->with('error', 'Draft user not found.');
+    public function removeIdFromRequest($data): string
+    {
+        // Decode the JSON string into an associative array
+        $decodedData = json_decode($data, true);
+
+        // Check if 'id' exists in the array and unset it
+        if (isset($decodedData['id'])) {
+            unset($decodedData['id']);
+        }
+
+        // Return the modified JSON string
+        return json_encode($decodedData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    public function extractUserNameFromData($jsonString): ?string
+    {
+        if(is_array($jsonString)){
+            $registrationStepArray = $jsonString;
+        }
+        else {
+            $registrationStepArray = json_decode($jsonString, true);
+        }
+
+        // Check if 'data' key exists
+        if ($registrationStepArray['user_name']) {
+            return $registrationStepArray['user_name'];
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function checkIfEmailExists($user): void
+    {
+        $stringData = json_decode($user, true);
+
+        if (!isset($stringData['email'])) {
+            return;
+        }
+
+        if(User::where('email', $stringData['email'])->exists() ){
+            throw new Exception('Email already exists.');
         }
     }
 
-    public function addSecondDraftPage($request)
+    public function saveRegistrationStep(RegistrationStep $registrationStep): void
     {
-        // Find the draft user by user name
-        $draftUser = $this->getDraftUser(session('user_name'));
+        $registrationStep->save();
+    }
 
-        if ($draftUser) {
-            // Update the user's fields
-            $draftUser->phone = $request->input('phone');
-            $draftUser->email = $request->input('email');
-            $draftUser->password = bcrypt($request->input('password'));
-            $draftUser->current_status = 'Step2';
+    public function removeTokenFromRequest($data): string
+    {
+        // Decode the JSON string into an associative array
+        $decodedData = json_decode($data, true);
 
-            // Save the changes
-            $draftUser->save();
-            $this->saveUserNameSession($draftUser->user_name);
-        } else {
-            // Handle the case where the user is not found
-            return redirect()->back()->with('error', 'Draft user not found.');
+        // Check if 'id' exists in the array and unset it
+        if (isset($decodedData['_token'])) {
+            unset($decodedData['_token']);
         }
+
+        // Return the modified JSON string
+        return json_encode($decodedData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
     }
-
-    public function addThirdDraftPage($request)
-    {
-        // Find the draft user by user name
-        $draftUser = $this->getDraftUser(session('user_name'));
-
-        if ($draftUser) {
-            // Update the user's fields
-            $draftUser->image_url = $request->file('image_url')->store('images', 'public');
-            $draftUser->email_verified_at = now();
-            $draftUser->verified = $request->input('messageType');
-            $draftUser->current_status = 'Step3';
-
-            $draftUser->save();
-            $this->saveUserNameSession($draftUser->user_name);
-            session()->flush();
-        } else {
-            // Handle the case where the user is not found
-            return redirect()->back()->with('error', 'Draft user not found.');
-        }
-    }
-
-    public function getDraftUser($userName)
-    {
-        if(!$userName)
-            return DraftUser::where('user_name', '')->first();
-
-        return DraftUser::where('user_name', $userName)->first();
-    }
-
-    public function saveUserNameSession($userName)
-    {
-        session(['user_name' => $userName]);
-    }
-
 }

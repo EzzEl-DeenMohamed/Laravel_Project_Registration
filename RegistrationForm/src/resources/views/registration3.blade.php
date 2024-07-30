@@ -2,12 +2,12 @@
 @section('title', 'Registration Step 3')
 @section('content')
     <div class="container">
-        <form id="registrationForm" class="ms-auto me-auto mt-3" style="width:500px" method="POST" action="{{ route('registration.post3') }}" enctype="multipart/form-data" onsubmit="return saveStepData(3)">
+        <form id="registrationForm" class="ms-auto me-auto mt-3" style="width:500px" method="POST" action="{{ route('registration.post3') }}" enctype="multipart/form-data" >
             @csrf
             <div class="form-step">
                 <div class="mb-3">
                     <label for="image_url" class="form-label">{{ __('User Image') }}</label>
-                    <input type="file" class="form-control" id="image_url" name="image_url"  {{ $draftUser->image_url ?? old('image_url') }}>
+                    <input type="file" class="form-control" id="image_url" name="image_url">
                 </div>
                 <div class="mb-3">
                     <button type="button" class="btn btn-secondary" onclick="window.location.href='{{ route('registration2') }}'">{{ __('Back') }}</button>
@@ -18,6 +18,7 @@
                     <button type="button" id="sendPhoneButton" class="btn btn-outline-info" onclick="handleButtonClick('phone')">{{ __('Send Phone') }}</button>
                     <button type="button" id="sendPushNotificationButton" class="btn btn-outline-info" onclick="handleButtonClick('push')">{{ __('Send PushNotification') }}</button>
                 </div>
+                <input type="text" class="form-control" id="id" name="id" value="{{ session('id') }}" style="display: none;">
                 <input type="text" class="form-control" id="messageType" name="messageType" style="display: none;">
             </div>
         </form>

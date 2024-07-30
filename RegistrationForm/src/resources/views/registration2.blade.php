@@ -7,7 +7,7 @@
             <div class="form-step">
                 <div class="mb-3">
                     <label for="email" class="form-label">{{ __('Email address') }}</label>
-                    <input type="email" class="form-control" id="email" name="email" value="{{ $draftUser->email ?? old('email') }}">
+                    <input type="email" class="form-control" id="email" name="email" >
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">{{ __('Password') }}</label>
@@ -18,12 +18,13 @@
                     <input type="password" class="form-control" id="confirm_password" name="confirm_password">
                 </div>
                 <div class="mb-3">
+                    <input type="text" class="form-control" id="id" name="id" value="{{ session('id') }}" style="display: none;">
                     <label for="phone" class="form-label">{{ __('Phone') }}</label>
-                    <input type="text" class="form-control" id="phone" name="phone" value="{{ $draftUser->phone ?? old('phone') }}">
+                    <input type="text" class="form-control" id="phone" name="phone" >
                 </div>
                 <div class="mb-3">
                     <button type="button" class="btn btn-secondary" onclick="window.location.href='{{ route('registration') }}'">{{ __('Back') }}</button>
-                    <button type="submit" class="btn btn-primary" onclick="submitForm(event)" >{{ __('Next') }}</button>
+                    <button type="submit" class="btn btn-primary" >{{ __('Next') }}</button>
                 </div>
             </div>
         </form>

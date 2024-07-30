@@ -4,49 +4,54 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Services\Auth\RegistrationService;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class RegistrationController extends Controller
 {
-    private RegistrationService $registrationService;
 
-    public function __construct(RegistrationService $registrationService)
+    public function registration(): View|Factory|Application
     {
-        $this->registrationService = $registrationService;
+//        $draftUser = $this->registrationService->getDraftUser(session('user_name'));
+        return view('registration');
     }
 
-    public function registration(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application
+    public function __construct(private readonly RegistrationService $registrationService){}
+
+    public function registrationPost(Request $request): RedirectResponse
     {
-        $draftUser = $this->registrationService->getFirstRegistrationPage();
-        return view('registration', ['draftUser' => $draftUser]);
+        $id = $this->registrationService->postRegistration($this->registrationService->makeRequestDataJson($request));
+
+        return redirect()->route('registration2')
+            ->with('id',$id );
     }
-
-    public function registrationPost(Request $request): \Illuminate\Http\RedirectResponse
+    public function registrationPost2(Request $request): RedirectResponse
     {
-        $this->registrationService->postFirstRegistrationPage($request);
-        return redirect()->route('registration2');
+
+        $id = $this->registrationService->postRegistration2($this->registrationService->makeRequestDataJson($request));
+        return redirect()->route('registration3')
+            ->with('id', $id);
     }
-
-    public function registration2(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application
+    public function registrationPost3(Request $request): RedirectResponse
     {
-        return view('registration2', ['draftUser' => $this->registrationService->userRepository->getDraftUser(session('user_name'))]);
-    }
-
-    public function registrationPost2(Request $request): \Illuminate\Http\RedirectResponse
-    {
-        $this->registrationService->postSecondRegistrationPage($request);
-        return redirect()->route('registration3');
-    }
-
-
-    public function registration3(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application
-    {
-        return view('registration3',['draftUser' => $this->registrationService->userRepository->getDraftUser(session('user_name'))]);
-    }
-
-    public function registrationPost3(Request $request): \Illuminate\Http\RedirectResponse
-    {
-        $this->registrationService->postThirdRegistrationPage($request);
+        $this->registrationService->postRegistration3($this->registrationService->makeRequestDataJson($request),$this->registrationService->uploadFileAndReturnPath($request));
         return redirect()->route('home');
     }
+
+    public function registration2(): View|Factory|Application
+    {
+//        $data = $this->registrationService->getDraftUserArray(session('id'));
+//        dd($data);
+        return view('registration2');
+    }
+
+
+    public function registration3(): View|Factory|Application
+    {
+        return view('registration3');
+    }
+
 }

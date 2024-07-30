@@ -28,7 +28,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'admin' => Admin::class
+            'admin' => Admin::class,
+            'check.registration.progress' => \App\Http\Middleware\CheckRegistrationProgress::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
