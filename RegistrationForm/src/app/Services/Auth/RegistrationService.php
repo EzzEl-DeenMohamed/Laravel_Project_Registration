@@ -2,182 +2,138 @@
 
 namespace App\Services\Auth;
 
-use App\Http\Controllers\SendMessageRegistrationController;
 use App\Models\RegistrationStep;
 use App\repository\Contracts\RegistrationRepositoryInterface;
+use App\Services\UploaderService;
 use Exception;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
-class RegistrationService
+readonly class RegistrationService
 {
 
-    public function __construct(private readonly RegistrationRepositoryInterface $userRepository){}
-
-//    public function registrationPostService($draftUser)
-//    {
-//        $this->userRepository->moveDataFromDraftToPrimary($draftUser);
-//
-//        $dtoRegister = $this->userRepository->makeRegistrationDto($draftUser);
-//
-//        $SendMessageRegistrationController = new SendMessageRegistrationController();
-//        $SendMessageRegistrationController->send($dtoRegister);
-//        return true;
-//    }
+    public function __construct(
+        private RegistrationRepositoryInterface $userRepository,
+        private UserService                     $userService,
+        private UploaderService                 $uploaderService
+    )
+    {}
 
     /**
      * @throws Exception
      */
-    public function postRegistration($data)
+    public function addProfileData($data)
     {
-        $registrationStep = $this->userRepository->checkIfExistUser($data);
-
-        if ($registrationStep) {
-
-            $existingData['current_step'] = $registrationStep->current_step;
-            $allData = $registrationStep->data;
-            $allData['Profile Data'] = $this->userRepository->removeTokenFromRequest($this->userRepository->removeIdFromRequest($data));
-
-
-            // Update the current step only if the new step is greater
-            if (1 > $existingData['current_step']) {
-                $existingData['current_step'] = 1;
-            }
-
-            // Update the registration step record with the new data and current step
-            $registrationStep->data = $allData;
-            $registrationStep->current_step = $existingData['current_step'];
-
-        } else {
-
-            $dataFinal = [
-                'Profile Data' => $this->userRepository->removeTokenFromRequest($data)
-            ];
-
-            $registrationStep = new RegistrationStep([
-                'data' => $dataFinal,
-                'current_step' => 1
-            ]);
-        }
-        $this->userRepository->saveRegistrationStep($registrationStep);
+        $decodedData = json_decode($data, true);
+        $this->userService->findUserByName($decodedData['user_name']);
+        $registrationStep = new RegistrationStep([
+            'data' => [
+                'Profile_Data' => $this->removeTokenFromRequest($data)
+            ],
+            'current_step' => 1
+        ]);
+        $this->userRepository->addRegistrationStep($registrationStep);
         return $registrationStep->id;
     }
 
     /**
      * @throws Exception
      */
-    public function postRegistration2($data)
+    public function addVerificationData($data): int
     {
+        $data = json_decode($data, true);
+        $this->checkIfEmailExists($data);
+        $data['Verification Data'] = $this->removeTokenFromRequest($this->removeIdFromRequest($data));
 
-        $id = json_decode($data, true);
-        $this->userRepository->checkIfEmailExists($data);
-        $registrationStep = $this->userRepository->findUserById($id['id']) ?? throw new Exception('User not found.');
-
-        if ($registrationStep) {
-
-            $existingData['current_step'] = $registrationStep->current_step;
-            $allData = $registrationStep->data;
-            $allData['Verification Data'] = $this->userRepository->removeTokenFromRequest($this->userRepository->removeIdFromRequest($data));
-
-
-            if ($existingData['current_step'] == 3) {
-                throw new Exception('User already completed the registration process.');
-            }
-
-            // Update the current step only if the new step is greater
-            if (2 > $existingData['current_step']) {
-                $existingData['current_step'] = 2;
-            }
-
-            // Update the registration step record with the new data and current step
-            $registrationStep->data = $allData;
-            $registrationStep->current_step = $existingData['current_step'];
-
-        }
-        $this->userRepository->saveRegistrationStep($registrationStep);
-        return $registrationStep->id;
-
+        return $this->processSaveDataInTwoSteps($data, 2);
     }
 
     /**
      * @throws Exception
      */
-    public function postRegistration3($data, $filePath)
+    public function addImageData($data, $filePath)
     {
         $data = $this->addImageUrl($data, $filePath);
-        $id = json_decode($data, true);
-        $this->userRepository->checkIfEmailExists($data);
-        $registrationStep = $this->userRepository->findUserById($id['id']) ?? throw new Exception('User not found.');
+        $data = json_decode($data, true);
+        $data['Image Data'] = $this->removeTokenFromRequest($this->removeIdFromRequest($data));
 
-        if ($registrationStep) {
+        return $this->processSaveDataInTwoSteps($data, 3);
+    }
 
-            $existingData['current_step'] = $registrationStep->current_step;
-            $allData = $registrationStep->data;
-            $allData['Image Data'] = $this->userRepository->removeTokenFromRequest($this->userRepository->removeIdFromRequest($data));
+    /**
+     * Process the common logic for saving registration data.
+     *
+     * @param array $data
+     * @param int $newStep
+     * @return int
+     * @throws Exception
+     */
+    private function processSaveDataInTwoSteps(array $data, int $newStep): int
+    {
+        $registrationStep = $this->userRepository->findDraftUserById($data['id']) ?? throw new Exception('User not found.');
 
+        $existingData['current_step'] = $registrationStep->current_step;
+        $allData = $registrationStep->data;
 
-            if ($existingData['current_step'] == 3) {
-                throw new Exception('User already completed the registration process.');
-            }
-
-            // Update the current step only if the new step is greater
-            if (3 > $existingData['current_step']) {
-                $existingData['current_step'] = 3;
-            }
-
-            // Update the registration step record with the new data and current step
-            $registrationStep->data = $allData;
-            $registrationStep->current_step = $existingData['current_step'];
-
+        if (3 === $existingData['current_step']) {
+            throw new \RuntimeException('User already completed the registration process.');
         }
-        $this->userRepository->saveRegistrationStep($registrationStep);
+
+        if ($newStep > $existingData['current_step']) {
+            $existingData['current_step'] = $newStep;
+        }
+
+        $registrationStep->data = array_merge($allData, $data);
+        $registrationStep->current_step = $existingData['current_step'];
+
+        $this->userRepository->addRegistrationStep($registrationStep);
         return $registrationStep->id;
     }
 
-    public function makeRequestDataJson($request)
+    public function makeRequestDataJson($request): false|string
     {
         return json_encode($request->all());
     }
 
-    public function uploadFileAndReturnPath(Request $request)
-    {
-        // Check if the request contains a file
-        if ($request->hasFile('image_url')) {
-            // Validate the file (optional)
-            $request->validate([
-                'image_url' => 'required|file|mimes:jpg,png,pdf,doc,docx|max:2048', // Add your validation rules here
-            ]);
-
-            // Retrieve the file from the request
-            $file = $request->file('image_url');
-
-            // Define a file path to store the file
-            $filePath = 'uploads/' . time() . '_' . $file->getClientOriginalName();
-
-            // Store the file in the storage/app/uploads directory
-            Storage::put($filePath, file_get_contents($file));
-
-            // Optionally, you can save the file path or other info to the database
-
-            // Return a response to indicate successful upload
-            return $filePath;
-        }
-        return '';
-
-    }
-
-    public function addImageUrl($data, $filePath)
+    private function addImageUrl($data, $filePath): false|string
     {
         $data = json_decode($data, true);
         $data['image_url'] = $filePath;
         return json_encode($data);
     }
 
-//    public function getDraftUserArray($id)
-//    {
-//        $userDataRequest = $this->userRepository->findUserById($id);
-//        dd($this->makeRequestDataJson($userDataRequest));
-//        return $this->makeRequestDataJson($userDataRequest);
-//    }
+    public function removeIdFromRequest($data): string
+    {
+        if (isset($data['id'])) {
+            unset($data['id']);
+        }
+
+        return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function checkIfEmailExists($user): bool
+    {
+        if (!isset($user['email'])) {
+            return 0;
+        }
+        return $this->userService->findUserNameByEmail($user['email']);
+    }
+
+    public function removeTokenFromRequest($data): string
+    {
+        $decodedData = json_decode($data, true);
+
+        if (isset($decodedData['_token'])) {
+            unset($decodedData['_token']);
+        }
+
+        return json_encode($decodedData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    public function uploadFileAndReturnPath($request): string
+    {
+        return $this->uploaderService->uploadFileAndReturnPath($request);
+    }
 
 }

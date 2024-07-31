@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\repository\Contracts\RegistrationRepositoryInterface;
 use Closure;
+use Exception;
 use Illuminate\Http\Request;
 
 class CheckRegistrationProgress
@@ -11,9 +12,12 @@ class CheckRegistrationProgress
 
     public function __construct(private readonly RegistrationRepositoryInterface $RegistrationRepository){}
 
+    /**
+     * @throws Exception
+     */
     public function handle(Request $request, Closure $next, int $requiredStatus)
     {
-        $registrationStep = $this->RegistrationRepository->findUserById($request->id);
+        $registrationStep = $this->RegistrationRepository->findDraftUserById($request->id);
         if (!$registrationStep) {
             abort(401);
         }

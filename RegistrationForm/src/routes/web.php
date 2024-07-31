@@ -18,12 +18,12 @@ Route::get('Registration-Form1', [RegistrationController::class, 'registration']
 Route::post('Registration-Form1', [RegistrationController::class, 'registrationPost'])->name('registration.post');
 
 Route::get('Registration-Form2', [RegistrationController::class, 'registration2'])
-    ->name('registration2')->middleware('check.registration.progress:1');
+    ->name('registration2');
 Route::post('Registration-Form2', [RegistrationController::class, 'registrationPost2'])
     ->name('registration.post2');
 
 Route::get('Registration-Form3', [RegistrationController::class, 'registration3'])
-    ->name('registration3')->middleware('check.registration.progress:1');
+    ->name('registration3');
 Route::post('Registration-Form3', [RegistrationController::class, 'registrationPost3'])
     ->name('registration.post3');
 
