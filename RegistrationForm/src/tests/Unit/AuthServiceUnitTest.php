@@ -5,7 +5,7 @@ namespace Tests\Unit;
 use App\Dtos\DtoLogin;
 use App\Dtos\DtoRegister;
 use App\Http\Controllers\SendMessageRegistrationController;
-use App\repository\DraftRepository;
+use App\repository\RegistrationRepository;
 use App\Services\Auth\RegistrationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -20,7 +20,7 @@ class AuthServiceUnitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->userRepositoryMock = Mockery::mock(DraftRepository::class);
+        $this->userRepositoryMock = Mockery::mock(RegistrationRepository::class);
         $this->authService = Mockery::mock(new RegistrationService($this->userRepositoryMock));
     }
 

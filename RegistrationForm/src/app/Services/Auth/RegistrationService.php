@@ -11,7 +11,7 @@ readonly class RegistrationService
 {
 
     public function __construct(
-        private RegistrationRepositoryInterface $userRepository,
+        private RegistrationRepositoryInterface $registrationRepository,
         private UserService                     $userService,
         private UploaderService                 $uploaderService
     )
@@ -30,7 +30,7 @@ readonly class RegistrationService
             ],
             'current_step' => 1
         ]);
-        $this->userRepository->addRegistrationStep($registrationStep);
+        $this->registrationRepository->addRegistrationStep($registrationStep);
         return $registrationStep->id;
     }
 
@@ -41,7 +41,7 @@ readonly class RegistrationService
     {
         $data = json_decode($data, true);
         $this->checkIfEmailExists($data);
-        $data['Verification Data'] = $this->removeTokenFromRequest($this->removeIdFromRequest($data));
+        $data['Verification_Data'] = $this->removeTokenFromRequest($this->removeIdFromRequest($data));
 
         return $this->processSaveDataInTwoSteps($data, 2);
     }
@@ -53,7 +53,7 @@ readonly class RegistrationService
     {
         $data = $this->addImageUrl($data, $filePath);
         $data = json_decode($data, true);
-        $data['Image Data'] = $this->removeTokenFromRequest($this->removeIdFromRequest($data));
+        $data['Image_Data'] = $this->removeTokenFromRequest($this->removeIdFromRequest($data));
 
         return $this->processSaveDataInTwoSteps($data, 3);
     }
@@ -68,7 +68,7 @@ readonly class RegistrationService
      */
     private function processSaveDataInTwoSteps(array $data, int $newStep): int
     {
-        $registrationStep = $this->userRepository->findDraftUserById($data['id']) ?? throw new Exception('User not found.');
+        $registrationStep = $this->registrationRepository->findDraftUserById($data['id']) ?? throw new Exception('User not found.');
 
         $existingData['current_step'] = $registrationStep->current_step;
         $allData = $registrationStep->data;
@@ -84,7 +84,12 @@ readonly class RegistrationService
         $registrationStep->data = array_merge($allData, $data);
         $registrationStep->current_step = $existingData['current_step'];
 
-        $this->userRepository->addRegistrationStep($registrationStep);
+        $this->registrationRepository->addRegistrationStep($registrationStep);
+
+        if(3 === $newStep) {
+            $this->makeRegistrationStepToBeUser($registrationStep->id);
+        }
+
         return $registrationStep->id;
     }
 
@@ -134,6 +139,12 @@ readonly class RegistrationService
     public function uploadFileAndReturnPath($request): string
     {
         return $this->uploaderService->uploadFileAndReturnPath($request);
+    }
+
+    public function makeRegistrationStepToBeUser($id)
+    {
+        $user = $this->registrationRepository->findDraftUserById($id);
+        $this->userService->createUser($user->data);
     }
 
 }

@@ -25,18 +25,16 @@ class UserRepository implements UserRepositoryInterface
 
     public function addUser(DtoRegister $dtoRegister): User
     {
-        $data['full_name'] = $dtoRegister->getFullName();
-        $data['user_name'] = $dtoRegister->getUserName();
-        $data['birthdate'] = $dtoRegister->getBirthdate();
-        $data['phone'] = $dtoRegister->getPhone();
-        $data['address'] = $dtoRegister->getAddress();
-        $data['password'] = Hash::make($dtoRegister->getPassword());
-        $data['email'] = $dtoRegister->getEmail();
-        $data['user_type'] = 'user';
-        $data['verified'] = $dtoRegister->getMessageType();
-
-        $user = User::create($data);
-
+        $user = new User();
+        $user->full_name = $dtoRegister->getFullName();
+        $user->user_name = $dtoRegister->getUserName();
+        $user->birthdate = $dtoRegister->getBirthdate();
+        $user->phone = $dtoRegister->getPhone();
+        $user->address = $dtoRegister->getAddress();
+        $user->password = Hash::make($dtoRegister->getPassword());
+        $user->email = $dtoRegister->getEmail();
+        $user->verified = $dtoRegister->getMessageType();
+        $user->save();
         return $user;
     }
 }

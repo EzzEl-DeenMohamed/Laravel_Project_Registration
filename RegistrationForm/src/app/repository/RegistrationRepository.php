@@ -6,7 +6,7 @@ use App\Models\RegistrationStep;
 use App\repository\Contracts\RegistrationRepositoryInterface;
 use Exception;
 
-class DraftRepository implements RegistrationRepositoryInterface
+class RegistrationRepository implements RegistrationRepositoryInterface
 {
     public function __construct()
     {
