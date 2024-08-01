@@ -3,11 +3,8 @@
 namespace App\repository;
 
 use App\Dtos\DtoRegister;
-use App\Models\RegistrationStep;
 use App\Models\User;
-use App\repository\Contracts\RegistrationRepositoryInterface;
 use App\repository\Contracts\UserRepositoryInterface;
-use Exception;
 use Illuminate\Support\Facades\Hash;
 
 class UserRepository implements UserRepositoryInterface
@@ -38,3 +35,6 @@ class UserRepository implements UserRepositoryInterface
         return $user;
     }
 }
+
+
+// mohamed sa3eedd

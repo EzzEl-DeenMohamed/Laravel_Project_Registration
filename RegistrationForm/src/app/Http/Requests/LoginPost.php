@@ -3,6 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator;
 
 class LoginPost extends FormRequest
 {
@@ -40,5 +43,14 @@ class LoginPost extends FormRequest
             'password.required' => 'Password is required.',
             'password.min' => 'Password must be at least 8 characters.',
         ];
+    }
+
+    protected function failedValidation(Validator|\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        // Log the validation errors or perform other actions
+        Log::error('Validation failed:', $validator->errors()->toArray());
+
+        // Optionally throw a custom exception
+        throw new ValidationException($validator);
     }
 }

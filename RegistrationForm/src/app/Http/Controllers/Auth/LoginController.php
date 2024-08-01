@@ -7,6 +7,11 @@ use App\Exceptions\FailedToLogin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginPost;
 use App\Services\Auth\LoginService;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Application;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Redirector;
 
 class LoginController extends Controller
 {
@@ -27,18 +32,18 @@ class LoginController extends Controller
     /**
      * @throws FailedToLogin
      */
-    public function login(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application
+    public function login(): View|Factory|Application
     {
         return $this->loginService->loginServices() ? view('welcome') : view('login');
     }
 
-    public function logout(): \Illuminate\Foundation\Application|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+    public function logout(): Application|Redirector|RedirectResponse
     {
         $this->loginService->logout();
         return redirect(route('login'));
     }
 
-    public function adminPlace(): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application
+    public function adminPlace(): View|Factory|Application
     {
         return view('admin');
     }

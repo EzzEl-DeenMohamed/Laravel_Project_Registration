@@ -3,6 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator;
 
 class RegistrationMessageRequest extends FormRequest
 {
@@ -32,5 +35,14 @@ class RegistrationMessageRequest extends FormRequest
             'phone' => 'required_if:messageType,phone|nullable|string|max:15',
             //
         ];
+    }
+
+    protected function failedValidation(Validator|\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        // Log the validation errors or perform other actions
+        Log::error('Validation failed:', $validator->errors()->toArray());
+
+        // Optionally throw a custom exception
+        throw new ValidationException($validator);
     }
 }

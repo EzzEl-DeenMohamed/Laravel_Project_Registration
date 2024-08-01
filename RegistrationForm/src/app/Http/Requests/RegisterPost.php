@@ -3,6 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator;
 
 class RegisterPost extends FormRequest
 {
@@ -44,5 +47,14 @@ class RegisterPost extends FormRequest
             'birthdate.date' => 'Birthdate must be a valid date.',
             'address.required' => 'Address is required.',
         ];
+    }
+
+    protected function failedValidation(Validator|\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        // Log the validation errors or perform other actions
+        Log::error('Validation failed:', $validator->errors()->toArray());
+
+        // Optionally throw a custom exception
+        throw new ValidationException($validator);
     }
 }

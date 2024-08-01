@@ -6,6 +6,8 @@ use App\Models\RegistrationStep;
 use App\repository\Contracts\RegistrationRepositoryInterface;
 use App\Services\UploaderService;
 use Exception;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 
 readonly class RegistrationService
 {
@@ -49,13 +51,20 @@ readonly class RegistrationService
     /**
      * @throws Exception
      */
-    public function addImageData($data, $filePath)
+    public function addImageData($data, $filePath): int
     {
         $data = $this->addImageUrl($data, $filePath);
         $data = json_decode($data, true);
-        $data['Image_Data'] = $this->removeTokenFromRequest($this->removeIdFromRequest($data));
 
-        return $this->processSaveDataInTwoSteps($data, 3);
+        $id = 0;
+
+        DB::transaction(function() use ($data) {
+            $data['Image_Data'] = $this->removeTokenFromRequest($this->removeIdFromRequest($data));
+            $id = $this->processSaveDataInTwoSteps($data, 3);
+            $this->makeRegistrationStepToBeUser($id);
+        });
+        return $id;
+
     }
 
     /**
@@ -85,10 +94,6 @@ readonly class RegistrationService
         $registrationStep->current_step = $existingData['current_step'];
 
         $this->registrationRepository->addRegistrationStep($registrationStep);
-
-        if(3 === $newStep) {
-            $this->makeRegistrationStepToBeUser($registrationStep->id);
-        }
 
         return $registrationStep->id;
     }
@@ -136,15 +141,16 @@ readonly class RegistrationService
         return json_encode($decodedData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
-    public function uploadFileAndReturnPath($request): string
+    public function uploadFileAndReturnPath(UploadedFile $image): string
     {
-        return $this->uploaderService->uploadFileAndReturnPath($request);
+        return $this->uploaderService->uploadBinaryFile($image, 'users/images');
     }
 
-    public function makeRegistrationStepToBeUser($id)
+    public function makeRegistrationStepToBeUser($id): void
     {
-        $user = $this->registrationRepository->findDraftUserById($id);
+        $user = $this->registrationRepository->findDraftUserById($id) ?? throw new Exception('User not found in Registration Step.');
         $this->userService->createUser($user->data);
+        $this->registrationRepository->deleteRegistrationStepUser($id);
     }
 
 }

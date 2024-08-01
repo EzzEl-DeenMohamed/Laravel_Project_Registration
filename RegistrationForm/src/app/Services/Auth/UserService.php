@@ -3,13 +3,19 @@
 namespace App\Services\Auth;
 
 use App\Dtos\DtoRegister;
+use App\Http\Controllers\SendMessageRegistrationController;
 use App\repository\Contracts\UserRepositoryInterface;
 use Exception;
 
 readonly class UserService
 {
     public function __construct(private UserRepositoryInterface $userRepository)
+    {}
+
+    public function sendMessageRegistration($dtoRegister): void
     {
+        $SendMessageRegistrationController = new SendMessageRegistrationController();
+        $SendMessageRegistrationController->send($dtoRegister);
     }
 
     /**
@@ -17,7 +23,12 @@ readonly class UserService
      */
     public function findUserByName($userName)
     {
-        return $this->userRepository->findUserByUserName($userName) ?? throw new Exception('Username already exists.');
+        if($this->userRepository->findUserByUserName($userName))
+        {
+            throw new \RuntimeException('Username already exists.');
+        }
+        return $this->userRepository->findUserByUserName($userName);
+
     }
 
     /**
@@ -30,7 +41,9 @@ readonly class UserService
 
     public function createUser($data): void
     {
-        $this->userRepository->addUser($this->createDtoFromRequest($data));
+        $dtoRegister = $this->createDtoFromRequest($data);
+        $this->sendMessageRegistration($dtoRegister);
+        $this->userRepository->addUser($dtoRegister);
     }
 
     public function createDtoFromRequest($data): DtoRegister

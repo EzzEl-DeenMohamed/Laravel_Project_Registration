@@ -2,38 +2,39 @@
 
 namespace App\Services;
 
-use Illuminate\Http\Request;
+use Carbon\Carbon;
+use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class UploaderService
 {
-    /**
-     * Upload a file and return its path.
-     *
-     * @param Request $request
-     * @return string
-     */
-    public function uploadFileAndReturnPath(Request $request): string
+    private Filesystem $disk;
+
+    public function __construct()
     {
-        // Check if the request contains a file
-        if ($request->hasFile('image_url')) {
-            // Validate the file (optional)
-            $request->validate([
-                'image_url' => 'required|file|mimes:jpg,png,pdf,doc,docx|max:2048',
-            ]);
+        $this->disk = Storage::disk('public');
+    }
 
-            // Retrieve the file from the request
-            $file = $request->file('image_url');
 
-            // Define a file path to store the file
-            $filePath = 'uploads/' . time() . '_' . $file->getClientOriginalName();
+    public function uploadBinaryFile(UploadedFile $file, string $basePath): string
+    {
+        $fileName = self::generateFileName($file->getClientOriginalName());
+        $filePath = self::generateFilePath($basePath, $fileName);
+        $this->disk->put($filePath, file_get_contents($file));
 
-            // Store the file in the storage/app/uploads directory
-            Storage::put($filePath, file_get_contents($file));
+        return $filePath;
+    }
 
-            return $filePath;
-        }
+    private static function generateFilePath(string $basePath, string $fileName): string
+    {
+        $now = Carbon::now();
 
-        return '';
+        return $basePath . '/' . $now->format('Y') . '/' . $now->format('m') . '/' . $now->format('d') . '/' . $fileName;
+    }
+
+    private static function generateFileName(string $fileName): string
+    {
+        return (\auth()->user() ? auth()->user()->id : null) . '_' . time() . '_' . $fileName;
     }
 }

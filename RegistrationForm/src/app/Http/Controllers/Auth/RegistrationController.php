@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RegisterPost;
+use App\Http\Requests\RegisterPost2;
+use App\Http\Requests\RegisterPost3;
 use App\Services\Auth\RegistrationService;
 use Exception;
 use Illuminate\Contracts\View\Factory;
@@ -25,7 +28,7 @@ class RegistrationController extends Controller
     /**
      * @throws Exception
      */
-    public function registrationPost(Request $request): RedirectResponse
+    public function registrationPost(RegisterPost $request): RedirectResponse
     {
         $id = $this->registrationService->addProfileData($this->registrationService->makeRequestDataJson($request));
 
@@ -35,7 +38,7 @@ class RegistrationController extends Controller
     /**
      * @throws Exception
      */
-    public function registrationPost2(Request $request): RedirectResponse
+    public function registrationPost2(RegisterPost2 $request): RedirectResponse
     {
 
         $id = $this->registrationService->addVerificationData($this->registrationService->makeRequestDataJson($request));
@@ -46,11 +49,11 @@ class RegistrationController extends Controller
     /**
      * @throws Exception
      */
-    public function registrationPost3(Request $request): RedirectResponse
+    public function registrationPost3(RegisterPost3 $request): RedirectResponse
     {
         $this->registrationService->addImageData(
             $this->registrationService->makeRequestDataJson($request),
-            $this->registrationService->uploadFileAndReturnPath($request)
+            $this->registrationService->uploadFileAndReturnPath($request->image_url)
         );
         return redirect()->route('home');
     }

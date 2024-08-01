@@ -3,6 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator;
 
 class RegisterPost2 extends FormRequest
 {
@@ -43,5 +46,14 @@ class RegisterPost2 extends FormRequest
             'email.email' => 'Email must be a valid email address.',
             'email.unique' => 'This email has already been taken.',
         ];
+    }
+
+    protected function failedValidation(Validator|\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        // Log the validation errors or perform other actions
+        Log::error('Validation failed:', $validator->errors()->toArray());
+
+        // Optionally throw a custom exception
+        throw new ValidationException($validator);
     }
 }

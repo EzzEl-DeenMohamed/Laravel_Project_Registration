@@ -34,4 +34,9 @@ class RegistrationRepository implements RegistrationRepositoryInterface
     {
         $registrationStep->save();
     }
+
+    public function deleteRegistrationStepUser($id): int
+    {
+        return RegistrationStep::destroy($id);
+    }
 }
